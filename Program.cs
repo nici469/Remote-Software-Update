@@ -101,6 +101,12 @@ namespace Remote_Software_Update
         }
 
         /// <summary>
+        /// the download url of the file containing software history, the download links of software versions and
+        /// their corresponding hashes and id.... not yet defined
+        /// </summary>
+        const string linkHistoryURL = "";//create this on a cloud server such as dropbox
+
+        /// <summary>
         /// starts a new thread to handle all software update(including download and execute) actions
         /// </summary>
         static void StartUpdateThread()
@@ -118,7 +124,7 @@ namespace Remote_Software_Update
         /// </summary>
         static void CheckForUpdate()
         {
-            WebClient client = new WebClient();
+            
 
             //create a Downloads folder in the curent directory if it doesnt exist
             if (!Directory.Exists("Downloads")) { 
@@ -126,8 +132,33 @@ namespace Remote_Software_Update
                 Console.WriteLine("Downloads folder created");
             }
 
+            Console.WriteLine("Checking for Update");
+            WebClient client = new WebClient();
+            
+            try
+            {
+                string linkHistoryData;
+                linkHistoryData = client.DownloadString(linkHistoryURL);
+                Console.WriteLine(linkHistoryData);
+                
+                UpdateVersion(linkHistoryData);
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Console.WriteLine("could not check for update");
+            }
             
 
+
+        }
+
+        /// <summary>
+        /// Compares current software version with the latest, then performs the necessary update actions
+        /// </summary>
+        /// <param name="historyData"></param>
+        static void UpdateVersion(string historyData)
+        {
 
         }
 
