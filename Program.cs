@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Diagnostics;
 using System.Net;
+using System.IO;
 
 namespace Remote_Software_Update
 {
@@ -76,15 +77,17 @@ namespace Remote_Software_Update
         /// </summary>
         static void ContinueNormalOperation() 
         {
+            Console.WriteLine("normal operation commenced");
             int count = 0;//to be incremented approximately every 1 minute
+            
+            StartUpdateThread();//Update thread is started at first execution and then every 2 hours
+            
             while (true)
             {
                 //check for update every 2 hours on a separate thread
-                if (count > 120) {
-                    ThreadStart newStart = new ThreadStart(CheckForUpdate);
-                    Thread GetUpdate = new Thread(newStart);
-                    GetUpdate.Name = "GetUdate";
-                    GetUpdate.Start();
+                if (count >= 120) {
+                    count = 0;//reset the counter every time it gets to 120(2hours)
+                    StartUpdateThread();
                 }
 
                 //download the uplink data necessary for the primary software functionss
@@ -93,7 +96,20 @@ namespace Remote_Software_Update
                 getUplink.Start();
 
                 Thread.Sleep(60000);//sleep the main thread for 1 minute
+                count++;
             }
+        }
+
+        /// <summary>
+        /// starts a new thread to handle all software update(including download and execute) actions
+        /// </summary>
+        static void StartUpdateThread()
+        {
+            Console.WriteLine("Starting update thread");
+            ThreadStart newStart = new ThreadStart(CheckForUpdate);
+            Thread GetUpdate = new Thread(newStart);
+            GetUpdate.Name = "GetUdate";
+            GetUpdate.Start();
         }
 
         /// <summary>
@@ -102,6 +118,16 @@ namespace Remote_Software_Update
         /// </summary>
         static void CheckForUpdate()
         {
+            WebClient client = new WebClient();
+
+            //create a Downloads folder in the curent directory if it doesnt exist
+            if (!Directory.Exists("Downloads")) { 
+                Directory.CreateDirectory("Downloads");
+                Console.WriteLine("Downloads folder created");
+            }
+
+            
+
 
         }
 
