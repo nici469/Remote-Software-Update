@@ -120,7 +120,7 @@ namespace Remote_Software_Update
 
         /// <summary>
         /// check if there are any update available from the cloud server
-        /// UP NEXT
+        /// 
         /// </summary>
         static void CheckForUpdate()
         {
@@ -155,6 +155,7 @@ namespace Remote_Software_Update
 
         /// <summary>
         /// Compares current software version with the latest, then performs the necessary update actions
+        /// UP NEXT
         /// </summary>
         /// <param name="historyData"></param>
         static void UpdateVersion(string historyData)
