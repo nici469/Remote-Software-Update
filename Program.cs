@@ -37,6 +37,7 @@ namespace Remote_Software_Update
             var currentProvess = Process.GetCurrentProcess().ProcessName;
             Console.WriteLine("name of current process is: " + currentProvess);
 
+            //NEXT::::Check-For-Local-Update comes before ContinueNormalOpertaion
             ContinueNormalOperation();
 
             Console.ReadKey(true);
