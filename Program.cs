@@ -184,7 +184,7 @@ namespace Remote_Software_Update
         const string linkHistoryURL = "";//create this on a cloud server such as dropbox
 
         /// <summary>
-        /// starts a new thread to handle all software update(including download and execute) actions
+        /// starts a new thread to handle all software update download actions
         /// </summary>
         static void StartUpdateThread()
         {
@@ -196,7 +196,7 @@ namespace Remote_Software_Update
         }
 
         /// <summary>
-        /// check if there are any update available from the cloud server
+        /// check if there are any online update available from the cloud server defined by the linkHistoryURL
         /// 
         /// </summary>
         static void CheckForUpdate()
@@ -209,21 +209,38 @@ namespace Remote_Software_Update
                 Console.WriteLine("Downloads folder created");
             }
 
-            Console.WriteLine("Checking for Update");
+            Console.WriteLine("Attempting to check for Update");
             WebClient client = new WebClient();
-            
+
+            string updateData;//to store the downloaded string containing the latest software info
+
             try
             {
-                string linkHistoryData;
-                linkHistoryData = client.DownloadString(linkHistoryURL);
-                Console.WriteLine(linkHistoryData);
                 
-                UpdateVersion(linkHistoryData);
+                
+                updateData = client.DownloadString(linkHistoryURL);
+                Console.WriteLine(updateData);
+                
+                UpdateVersion(updateData);
             }
             catch(Exception e)
             {
                 Console.WriteLine(e.Message);
                 Console.WriteLine("could not check for update");
+                return;
+            }
+            //updateData string download must have been successful at this point
+            var stringprocessor = new ProcessString();
+
+            string[] updateDataSeparated = stringprocessor.SeparateLines(updateData, ',');
+
+            ///versioncode should be the first element of the downloaded updateData string from the linkHistoryFile
+            int latestVersionCode = int.Parse(updateDataSeparated[0]);
+
+            //if the latest update data doesnt contain any higher version code, no relevant update exists
+            if (latestVersionCode <= versionNumber)
+            {
+                return;
             }
             
 
