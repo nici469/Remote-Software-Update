@@ -242,8 +242,46 @@ namespace Remote_Software_Update
             {
                 return;
             }
+            //code blocks below are executed only if latestVersion code is greater then that of the current exe instance
+
+            //check if an Update.exe file already exists in the downloads folder, and verify if its version code 
+            //matches with what was update from the linkHistoryURL
+
+            if (File.Exists("Downloads/Update.exe"))
+            {
+                int exeVersionCode = AppDomain.CurrentDomain.ExecuteAssembly("Downloads/Update.exe");
+
+                //if the Update.exe file found in the downloads folder has the same version code as the latest found online
+                //no further action is carried out
+                if(exeVersionCode == latestVersionCode) { return; }
+            }
+            else
+            {///if no update.exe file exists in the downloads folder or its version does not match what was found online
+                //download link of the latest update.exe file should be the second element of the string downloaded from linkHistoryURL
+                var downloadLink = updateDataSeparated[1];
+
+                try
+                {
+                    client.DownloadFile(downloadLink, "Downloads/Update.exe");
+                }
+                catch(Exception e)
+                {//if the download attempt fails, do nothing further
+                    return;
+                }
+
+                NotifyUser("An update is available");
+            }
             
 
+
+        }
+
+        /// <summary>
+        /// creates a toast notification with the specified message
+        /// </summary>
+        /// <param name="message"></param>
+        public static void NotifyUser(string message)
+        {
 
         }
 
