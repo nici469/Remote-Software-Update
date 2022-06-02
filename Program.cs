@@ -69,12 +69,56 @@ namespace Remote_Software_Update
         public static void ExecuteUpdate(int newVersionCode) { }
 
         /// <summary>
-        /// Checks for any downloaded local update, at produces the version code of the 
-        /// update file....still EMPTY
+        /// Checks for any downloaded local update.exe file, at produces the version code of the 
+        /// update file....CODED
         /// </summary>
         /// <param name="verifiedUpdateExists"></param>
         /// <param name="newVersionCode"></param>
-        public static void CheckForLocalUpdate(ref bool verifiedUpdateExists, ref int newVersionCode) { }
+        public static void CheckForLocalUpdate(ref bool verifiedUpdateExists, ref int newVersionCode) {
+            //if Downloads folder does not exist in the current directory, abandon update check and assume
+            //no verifiable update exists
+            if (!Directory.Exists("Downloads"))
+            {
+                verifiedUpdateExists = false;
+                return;
+            }
+            //if no update file exists in the Downloads folder, assume no verifiable update exists.
+            //abandon update check
+            else if (!File.Exists("Downloads/Update.exe"))
+            {
+                verifiedUpdateExists = false;
+                return;
+            }
+            //an update.exe file must have been found at this point
+
+            //attempt to get the version code of the update file
+            try
+            {
+                newVersionCode = AppDomain.CurrentDomain.ExecuteAssembly("Downloads/Update.exe",new string[] { "version"});
+            }
+            catch(Exception e)
+            {///if the attempt to get version code fails, the update.exe file is not a valid update file
+                File.Delete("Downloads/Update.exe");///delete the invalid update file so it isnt processed at next software startup
+                verifiedUpdateExists = false;
+                return;
+            }
+            //if the attempt to get the update.exe versioncode succeeded, compare the  new versioncode with the versioncode
+            //of the current running executable
+
+            if (newVersionCode > versionNumber)
+            {
+                verifiedUpdateExists = true;
+                return;
+            }
+            else
+            {
+                verifiedUpdateExists=false;
+                File.Delete("Downloads/Update.exe");///delete the invalid update file so it isnt processed at next software startup
+                return;
+            }
+
+
+        }
 
         /// <summary>
         /// carries out the operation of closing and deleting the old file once the new one,
