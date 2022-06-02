@@ -16,33 +16,65 @@ namespace Remote_Software_Update
         /// an ever-increasing number to store the current software version
         /// </summary>
         const int versionNumber = 4;
-        //static string oldFileNme;
+        ///static string oldFileNme;
         static async Task<int> Main(string[] args)
         {
-            //check if the input argument is not empthy and then if
-            //first input argument indicates a version request
+            ///check if the input argument is not empthy and then if
+            ///first input argument indicates a version request
             if (args.Length>0 && (args[0] == "version" || args[0] == "-v")) { Console.WriteLine ("Software version: "+versionNumber); return versionNumber; }
             
             else if(args.Length > 0)
-            { //if there are arguments but the first one isnt _version_, then it must be the oldFileName, 
-              //and this executable must be the newFile about to dispose of the old
+            { ///if there are arguments but the first one isnt _version_, then it must be the oldFileName, 
+              ///and this executable must be the newFile about to dispose of the old
                 string oldProcess = args[0];
 
-                //finalise update as an asynchronus task
+                ///finalise update as an asynchronus task
                 var FinaliseUpdateAsync = FinaliseUpdate(oldProcess);
 
                 
             }
 
-            var currentProvess = Process.GetCurrentProcess().ProcessName;
-            Console.WriteLine("name of current process is: " + currentProvess);
+            ///var currentProvess = Process.GetCurrentProcess().ProcessName;
+            ///Console.WriteLine("name of current process is: " + currentProvess);
+            
+            ///variables to store the existence of a verified update, and hence, its versioncode
+            bool verifiedUpdateExists = false;
+            int newVersionCode = 0;
 
-            //NEXT::::Check-For-Local-Update comes before ContinueNormalOpertaion
-            ContinueNormalOperation();
+            CheckForLocalUpdate(ref verifiedUpdateExists, ref newVersionCode);
 
+
+            ///if a verified update exists, Execute the update, otherwise continue regular software operation
+            if (verifiedUpdateExists)
+            {
+                ExecuteUpdate(newVersionCode);
+            }
+            else
+            {
+                ContinueNormalOperation();
+            }
+            return 0;
+
+            
             Console.ReadKey(true);
             return 0;
         }
+
+        /// <summary>
+        /// Moves any available verified update file from the downloads folder to the current app directory and 
+        /// executes the update file, then waits for the update file to terminate the current instance of app execution..
+        /// it throws an exception if current instance is not terminated after sometime......EMPTY
+        /// </summary>
+        /// <param name="newVersionCode"></param>
+        public static void ExecuteUpdate(int newVersionCode) { }
+
+        /// <summary>
+        /// Checks for any downloaded local update, at produces the version code of the 
+        /// update file....still EMPTY
+        /// </summary>
+        /// <param name="verifiedUpdateExists"></param>
+        /// <param name="newVersionCode"></param>
+        public static void CheckForLocalUpdate(ref bool verifiedUpdateExists, ref int newVersionCode) { }
 
         /// <summary>
         /// carries out the operation of closing and deleting the old file once the new one,
