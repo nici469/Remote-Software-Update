@@ -17,9 +17,22 @@ namespace Remote_Software_Update
         /// an ever-increasing number to store the current software version
         /// </summary>
         const int versionNumber = 4;
-        ///static string oldFileNme;
+        
+        /// <summary>
+        /// for debug only: to test if webclient.downloadfile can accept local directory as uri
+        /// </summary>
+        static void TestWebClientFTP()
+        {
+            WebClient myclient = new WebClient();
+            myclient.DownloadFile("URI/Update.exe", "Downloads/Update.exe");
+            Console.WriteLine("update downloaded");
+            Console.ReadKey(true);
+        }
         static async Task<int> Main(string[] args)
         {
+            //testing only
+            TestWebClientFTP();
+
             ///check if the input argument is not empthy and then if
             ///first input argument indicates a version request
             if (args.Length>0 && (args[0] == "version" || args[0] == "-v")) { Console.WriteLine ("Software version: "+versionNumber); return versionNumber; }
