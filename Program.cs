@@ -66,7 +66,27 @@ namespace Remote_Software_Update
         /// it throws an exception if current instance is not terminated after sometime......EMPTY
         /// </summary>
         /// <param name="newVersionCode"></param>
-        public static void ExecuteUpdate(int newVersionCode) { }
+        public static void ExecuteUpdate(int newVersionCode) {
+            //this method is and should be executed only after determining that a verified update exists in the 
+            //downloads folder
+            string newFileName = "Server" + newVersionCode + ".exe";
+
+            //move the update.exe file to the current directory and rename
+            File.Move("Downloads/Update.exe", newFileName);
+
+            //Get the name of the current exe process
+            string currentProcessName = Process.GetCurrentProcess().ProcessName;
+
+            //run the new file with the current process name as argument
+            Process.Start(newFileName, currentProcessName);
+
+            //wait 60s to be exited, then throw an exception if the newfile process fails to close the current one
+            Console.WriteLine("Current exe is awaiting auto-termination");
+
+            Thread.Sleep(60000);
+
+            throw new Exception("update file failed to terminate old process");
+        }
 
         /// <summary>
         /// Checks for any downloaded local update.exe file, at produces the version code of the 
