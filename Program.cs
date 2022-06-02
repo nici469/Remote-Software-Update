@@ -7,6 +7,7 @@ using System.Threading;
 using System.Diagnostics;
 using System.Net;
 using System.IO;
+using Microsoft.Toolkit.Uwp.Notifications;
 
 namespace Remote_Software_Update
 {
@@ -241,7 +242,7 @@ namespace Remote_Software_Update
                 updateData = client.DownloadString(linkHistoryURL);
                 Console.WriteLine(updateData);
                 
-                UpdateVersion(updateData);
+                //UpdateVersion(updateData);
             }
             catch(Exception e)
             {
@@ -269,7 +270,7 @@ namespace Remote_Software_Update
 
             if (File.Exists("Downloads/Update.exe"))
             {
-                int exeVersionCode = AppDomain.CurrentDomain.ExecuteAssembly("Downloads/Update.exe");
+                int exeVersionCode = AppDomain.CurrentDomain.ExecuteAssembly("Downloads/Update.exe",new string[] { "version"});
 
                 //if the Update.exe file found in the downloads folder has the same version code as the latest found online
                 //no further action is carried out
@@ -302,18 +303,13 @@ namespace Remote_Software_Update
         /// <param name="message"></param>
         public static void NotifyUser(string message)
         {
-
+            new ToastContentBuilder().AddArgument("send1", 222).AddHeader("", "NSONG Automation", "none")
+                .AddText(message)
+                //.AddText(message2)
+                .Show();
         }
 
-        /// <summary>
-        /// Compares current software version with the latest, then performs the necessary update actions
-        /// UP NEXT
-        /// </summary>
-        /// <param name="historyData"></param>
-        static void UpdateVersion(string historyData)
-        {
-
-        }
+        
 
         /// <summary>
         /// method for download the regular uplink data necessary for the primary functioning of this
