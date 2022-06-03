@@ -157,7 +157,7 @@ namespace Remote_Software_Update
         /// <summary>
         /// carries out the operation of closing and deleting the old file once the new one,
         /// which should be the current instance, is running.
-        /// This method is made asynchronus because "new thread" functions cannot receive parameters: it could habe simply benn executed 
+        /// This method is made asynchronus because "new thread" functions cannot receive parameters: it could have simply been executed 
         /// on a separate thread
         /// </summary>
         static  async Task FinaliseUpdate(string oldProcess) {
@@ -165,21 +165,33 @@ namespace Remote_Software_Update
             //still to be populated
             Process[] oldFileProcess = Process.GetProcessesByName(oldProcess);
 
-            //close the old process
-            foreach (Process process in oldFileProcess)
+            try
             {
-                Console.WriteLine("attempting to kill " + process.ProcessName);
-                process.Kill();
-                Console.WriteLine(process.ProcessName+" process killed, waiting for process exit");
-                process.WaitForExit();
-                Console.WriteLine("attempting to dispose " + process.ProcessName);
-                process.Dispose();
-            }
+                //close the old process
+                foreach (Process process in oldFileProcess)
+                {
+                    Console.WriteLine("attempting to kill " + process.ProcessName);
+                    process.Kill();
+                    Console.WriteLine(process.ProcessName + " process killed, waiting for process exit");
+                    process.WaitForExit();
+                    Console.WriteLine("attempting to dispose " + process.ProcessName);
+                    process.Dispose();
+                }
 
-            //delete the old exe file
-            Console.WriteLine("Attempting to delete old executable");
-            System.IO.File.Delete(oldProcess + ".exe");
-            Console.WriteLine("old file deleted");
+                //delete the old exe file
+                Console.WriteLine("Attempting to delete old executable");
+                System.IO.File.Delete(oldProcess + ".exe");
+                Console.WriteLine("old file deleted");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("");
+                Console.WriteLine("An exception occured when finalising update");
+                Console.WriteLine("The old process could not be killed or could not be deleted:");
+                Console.WriteLine("The file may not exist in the current directory");
+                Console.WriteLine(e.Message);
+            }
+            
             
         }
 
