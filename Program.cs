@@ -26,6 +26,8 @@ namespace Remote_Software_Update
             WebClient myclient = new WebClient();
             myclient.DownloadFile("URI/Update.exe", "Downloads/Update.exe");
             Console.WriteLine("update downloaded");
+            //for testing process.start
+            Process.Start("Update.exe","Testing2 process");
             Console.ReadKey(true);
         }
         static async Task<int> Main(string[] args)
@@ -77,7 +79,7 @@ namespace Remote_Software_Update
         /// <summary>
         /// Moves any available verified update file from the downloads folder to the current app directory and 
         /// executes the update file, then waits for the update file to terminate the current instance of app execution..
-        /// it throws an exception if current instance is not terminated after sometime......EMPTY
+        /// it throws an exception if current instance is not terminated after sometime......
         /// </summary>
         /// <param name="newVersionCode"></param>
         public static void ExecuteUpdate(int newVersionCode) {
@@ -272,10 +274,11 @@ namespace Remote_Software_Update
             catch(Exception e)
             {
                 Console.WriteLine(e.Message);
-                Console.WriteLine("could not check for update");
+                Console.WriteLine("Error: could not check for update");
                 return;
             }
-            //updateData string download must have been successful at this point
+            //updateData string download must have been successful at this point, and it is a 
+            //comma separated string
             var stringprocessor = new ProcessString();
 
             string[] updateDataSeparated = stringprocessor.SeparateLines(updateData, ',');
@@ -295,11 +298,29 @@ namespace Remote_Software_Update
 
             if (File.Exists("Downloads/Update.exe"))
             {
-                int exeVersionCode = AppDomain.CurrentDomain.ExecuteAssembly("Downloads/Update.exe",new string[] { "version"});
+                //attempt to execute the local Update.exe file in the downoads folder
+                try
+                {
+                    int exeVersionCode = AppDomain.CurrentDomain.ExecuteAssembly("Downloads/Update.exe", new string[] { "version" });
 
-                //if the Update.exe file found in the downloads folder has the same version code as the latest found online
-                //no further action is carried out
-                if(exeVersionCode == latestVersionCode) { return; }
+                    //if the Update.exe file found in the downloads folder has the same version code as the latest found online
+                    //no further action is carried out
+                    if (exeVersionCode == latestVersionCode) { return; }
+                    else {
+                        ///if the version code of the local update file does not match what was found online, delete the local update file
+                        ///this way, it can be redownloaded at the next check for update thread execution
+                        File.Delete("Downloads/Update.exe");
+                    }
+                }
+                catch(Exception e)
+                {
+                    //if executing the local update.exe file in the downloads folder fails, delete the file so it will not be processed
+                    //again when the software runs
+                    File.Delete("Downloads/Update.exe");
+                    Console.WriteLine("Error: " + e.Message);
+
+                }
+                
             }
             else
             {///if no update.exe file exists in the downloads folder or its version does not match what was found online
@@ -312,9 +333,10 @@ namespace Remote_Software_Update
                 }
                 catch(Exception e)
                 {//if the download attempt fails, do nothing further
+                    Console.WriteLine("Failed to download update file");
                     return;
                 }
-
+                //notify the user if the update download was successful
                 NotifyUser("An update is available");
             }
             
