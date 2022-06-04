@@ -248,7 +248,7 @@ namespace Remote_Software_Update
         /// the download url of the file containing software history, the download links of software versions and
         /// their corresponding hashes and id.... not yet defined
         /// </summary>
-        const string linkHistoryURL = "";//create this on a cloud server such as dropbox
+        const string linkHistoryURL = "URI/linkHistory.txt";//create this on a cloud server such as dropbox
 
         /// <summary>
         /// starts a new thread to handle all software update download actions
