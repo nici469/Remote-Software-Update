@@ -33,7 +33,7 @@ namespace Remote_Software_Update
         static async Task<int> Main(string[] args)
         {
             //testing only
-            TestWebClientFTP();
+            //TestWebClientFTP();
 
             ///check if the input argument is not empthy and then if
             ///first input argument indicates a version request
@@ -127,17 +127,30 @@ namespace Remote_Software_Update
             }
             //an update.exe file must have been found at this point
 
-            //attempt to get the version code of the update file
+            Console.WriteLine("An Update.exe file exists in Downloads folder");
+            ///attempt to get the version code of the update file
             try
             {
-                newVersionCode = AppDomain.CurrentDomain.ExecuteAssembly("Downloads/Update.exe",new string[] { "version"});
+                
+                //create a separate appdomain to execute the Update.exe file in the downloads folder
+                //this ensures the file can be deleted after use since the new appdomain can be safely disposed
+                ///if the file is instead run in the cuurent appDomain, it will throw an exception if a deletion is attempted
+                AppDomain domain = AppDomain.CreateDomain("newDomain");
+                newVersionCode = domain.ExecuteAssembly("Downloads/Update.exe", new string[] { "version" });
+
+                //safely dispose of the created appDomain
+                AppDomain.Unload(domain);
+                
             }
             catch(Exception e)
             {///if the attempt to get version code fails, the update.exe file is not a valid update file
                 File.Delete("Downloads/Update.exe");///delete the invalid update file so it isnt processed at next software startup
                 verifiedUpdateExists = false;
+                Console.WriteLine("Error: An exception occurred when trying to execute Downloads/Update.exe");
+                
                 return;
             }
+
             //if the attempt to get the update.exe versioncode succeeded, compare the  new versioncode with the versioncode
             //of the current running executable
 
@@ -147,8 +160,13 @@ namespace Remote_Software_Update
                 return;
             }
             else
-            {
+            {//if the current software instance is not outdated
+
                 verifiedUpdateExists=false;
+                Console.WriteLine("NewVersion code: " + newVersionCode);
+                Console.WriteLine("Info: no valid update exists.. Downloads/Update.exe will be deleted");
+                
+                
                 File.Delete("Downloads/Update.exe");///delete the invalid update file so it isnt processed at next software startup
                 return;
             }
@@ -166,6 +184,7 @@ namespace Remote_Software_Update
             Console.WriteLine("Attempting to Finalise Update");
             //still to be populated
             Process[] oldFileProcess = Process.GetProcessesByName(oldProcess);
+            Console.WriteLine("process {0} will now be closed", oldFileProcess);
 
             try
             {
