@@ -11,6 +11,9 @@ using Microsoft.Toolkit.Uwp.Notifications;
 
 namespace Remote_Software_Update
 {
+    /// <summary>
+    /// 
+    /// </summary>
     class Program
     {
         /// <summary>
