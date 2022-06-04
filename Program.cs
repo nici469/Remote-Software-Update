@@ -275,7 +275,7 @@ namespace Remote_Software_Update
                 Directory.CreateDirectory("Downloads");
                 Console.WriteLine("Downloads folder created");
             }
-
+            Console.WriteLine("");//emptyline
             Console.WriteLine("Attempting to check for Update");
             WebClient client = new WebClient();
 
@@ -357,6 +357,7 @@ namespace Remote_Software_Update
                 }
                 //notify the user if the update download was successful
                 NotifyUser("An update is available");
+                Console.WriteLine("Update: a software update is available");
             }
             
 
